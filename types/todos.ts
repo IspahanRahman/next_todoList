@@ -1,4 +1,5 @@
 export interface ITodos {
   id: string,
-  text: string
+  text: string,
+  completed: boolean
 }
