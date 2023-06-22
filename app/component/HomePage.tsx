@@ -1,17 +1,61 @@
 "use client";
 import React, { FormEventHandler, useState } from 'react'
 import { ITodos } from '@/types/todos';
+import { addTodo, deleteTodo, editTodo } from '@/api';
+import { useRouter } from 'next/navigation';
+import { v4 as uuid4 } from 'uuid';
+
 interface TodoListProps{
   todos: ITodos[];
 }
 const HomePage: React.FC<TodoListProps> = ({todos}) => {
-  const [newTodo, setNewTodo] = useState<string>('');
+  const [ newTodo, setNewTodo ] = useState<string>('');
+  const [ editingTodo, setEditingTodo ] = useState('');
+  const [ editTodoText, setEditTodoText ] = useState('');
 
-  const handleSubmit : FormEventHandler<HTMLFormElement> = (e) =>{
+  const router = useRouter();
+  const handleSubmit : FormEventHandler<HTMLFormElement> = async(e) =>{
     e.preventDefault();
-    console.log(newTodo);
+    await addTodo({
+      id:uuid4(),
+      text:newTodo
+    });
+
     setNewTodo("");
+    router.refresh();
   }
+
+  const updateTodo : FormEventHandler<HTMLFormElement> = async(value:any)=>{
+   await editTodo({
+    id:editingTodo,
+    text:editTodoText,
+   })
+   router.refresh();
+  }
+
+  const handleDelete = async(value:any) =>{
+    try{
+      await deleteTodo(value);
+      router.refresh();
+    }catch(e){
+      console.log(e)
+    }
+  }
+
+  const rerenderUpdateForm = (value:any) =>(
+    <td>
+      <form onSubmit={(e)=>updateTodo(e)}>
+        <input
+          className='px-4 py-3 w-4/5 bg-white text-black border-2 rounded-lg '
+          type='text'
+          value={editTodoText}
+          placeholder={value}
+          onChange={(e)=>setEditTodoText(e.target.value)}
+        />
+      </form>
+    </td>
+  )
+ 
   return (
     <div className='m-2 md:m-5 flex flex-col gap-4'>
       <h1 className=' text-xl text-black font-bold '>ADD ITEM</h1>
@@ -41,10 +85,24 @@ const HomePage: React.FC<TodoListProps> = ({todos}) => {
           <tbody>
             {todos.map((todo)=>(
               <tr key={todo.id}>
-                <td></td>
-                <td>{todo.text}</td>
-                <td><button>Edit</button></td>
-                <td><button>Delete</button></td>
+                <td>
+                  <input 
+                    type="checkbox" 
+                    className="checkbox" 
+                  />
+                </td>
+               
+                {editingTodo=== todo.id ? rerenderUpdateForm(todo.text)
+                :
+                <>
+                   <td>{todo.text}</td>
+                </>
+                }
+               
+                <td className='flex gap-5'>
+                  <button className='text-blue-500' onClick={()=>setEditingTodo(todo.id)}>Edit</button>
+                  <button className='text-red-500' onClick={()=>handleDelete(todo.id)}>Delete</button>
+                </td>
               </tr>
             ))}
           </tbody>

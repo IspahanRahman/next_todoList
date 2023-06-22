@@ -1,17 +1,8 @@
 {
-  "tasks":
-  [
+  "tasks": [
     {
-      "id":"1",
-      "text":"Have to complete the assignment"
-    },
-    {
-      "id":"2",
-      "text":"Have to do the rest of tast of e-commerce"
-    },
-    {
-      "id":"3",
-      "text":"Have to skilled up for the full-stack"
+      "id": "526ae197-329a-49dc-a0c7-e00aff73dd80",
+      "text": "nishat"
     }
   ]
 }
